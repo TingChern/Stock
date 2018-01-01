@@ -10,6 +10,7 @@ public class stock5 {
 	}
 
 	public void stockprice(String yearmonth, String stocknum) {
+		// 輸入年月和股票號碼來查某月股價
 		String urlConnect = "http://www.twse.com.tw/exchangeReport/STOCK_DAY?response=html&date=" + yearmonth + "01"
 				+ "&stockNo=" + stocknum;
 		URL url;
@@ -21,6 +22,7 @@ public class stock5 {
 			String content = "";
 			int start = 0;
 			int end = 0;
+			String[] daydata;
 			// StringBuilder test = new StringBuilder();
 			// String s;
 			FileWriter fw = new FileWriter("C:\\_JSP\\test1.html");
@@ -28,23 +30,39 @@ public class stock5 {
 				content += s + "\n";
 				if (s.contains("<tbody>")) {
 					start = content.indexOf("<tbody>");
-					System.out.println(start);
+					// System.out.println(start);
 				}
 				;
 				if (s.contains("</tbody>")) {
 					end = content.indexOf("</tbody>");
-					System.out.println(end);
-				};
+					// System.out.println(end);
+				}
+				;
 
 			}
-//			System.out.println(content);
-			 content=content.substring(start,end);
-//			 content = test.toString();
+			// System.out.println(content);
+			content = content.substring(start + "<tbody>".length(), end).trim();
+			daydata = content.split("</tr>");
+
+			// content = test.toString();
 			// System.out.print(content);
 			// System.out.println(s);
-			fw.write(content);
-			fw.flush();
+			for (int i = 0; i < daydata.length; i++) {
+				daydata[i] = daydata[i].replaceFirst("<tr>", "").trim();
+				// System.out.println(daydata[i]);
+				// fw.write(daydata[i]+"\n");
+				// fw.write("==========================="+"\n");
+				String[] data = daydata[i].split("</td>");
+				for (int j = 0; j < data.length; j++) {
+					data[j] = data[j].replaceFirst("<td>", "").trim();
+					fw.write(data[j] + "\n");
+				}
+				fw.write("\n");
 
+			}
+			;
+
+			fw.flush();
 			fw.close();
 
 		} catch (MalformedURLException e) {
